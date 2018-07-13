@@ -153,7 +153,7 @@ cat("\n pluviometri trovati : ", length(DBmeteo_staz[!aux]),"\n", file=fileout,a
 
 cat("\n\n -------------------------------------------------------------------\n",file=fileout,append=T)
 cat("\n Verifica dei nomi in HYDSTRA SITE\n",file=fileout,append=T)
-cat("\n IDstaz, HYD_SITE_nome,HYD_SITE_nome2, HYD_SITE_nome3,  DBmeteo_nome\n", file=fileout,append=T)
+cat("\n IDstaz, IDsens, HYD_SITE_nome,HYD_SITE_nome2, HYD_SITE_nome3,  DBmeteo_nome\n", file=fileout,append=T)
 i<-1
 while(i<=length(DBmeteo_staz)) {
   j<-which(HYD_SITE_staz==DBmeteo_staz[i])
@@ -162,6 +162,8 @@ while(i<=length(DBmeteo_staz)) {
   cat("in HYDSTRA ID=", DBmeteo_staz[i], " non esiste\n", file=fileout,append=T)
   } else {
    cat(DBmeteo_staz[i],
+       ",",
+       DBmeteo_sens[i],
        ",",
        HYD_SITE_nome[j],
        ",",
