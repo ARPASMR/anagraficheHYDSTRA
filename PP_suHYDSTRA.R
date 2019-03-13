@@ -1,5 +1,5 @@
 ###############################################################################
-#
+#  
 library(DBI)
 library(RMySQL)
 library(RODBC)
@@ -11,7 +11,7 @@ neverstop<-function(){
 }
 options(show.error.messages=TRUE,error=neverstop)
 
-dir_output<-"/home/meteo/programmi/anagrafica/out/"
+dir_output<-"/home/meteo/programmi/anagrafica/"
 dir_anagrafica<-"/home/meteo/programmi/anagrafica/"
 fileout<-paste(dir_output,"check_PP_validaz_HYDSTRA.txt",sep="")
 
@@ -21,14 +21,14 @@ cat(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><  \n\n",file=fileout)
 #==============================================================================
 cat( "\n\n  > leggi informazioni di Hydstra SITE\n", file=fileout,append=TRUE)
 
-HYD_SITE <- read.csv ( paste(dir_anagrafica,"SITE.CSV",sep="") , header = TRUE , dec=",", quote="\"", na.string=c("-9999",""),as.is = TRUE, sep=",")
+HYD_SITE <- read.csv ( paste(dir_anagrafica,"SITE.CSV",sep="") , header = TRUE , dec=",", quote="\"", na.string=c("-9999",""),as.is = TRUE, sep=",") 
 HYD_SITE_staz <- HYD_SITE$CATEGORY8[which(is.na(HYD_SITE$CATEGORY8)==F)]
 HYD_SITE_nome <- HYD_SITE$STNAME[which(is.na(HYD_SITE$CATEGORY8)==F)]
 HYD_SITE_nome2 <- HYD_SITE$STATION[which(is.na(HYD_SITE$CATEGORY8)==F)]
 HYD_SITE_nome3 <- HYD_SITE$SHORTNAME[which(is.na(HYD_SITE$CATEGORY8)==F)]
 #
 cat( "  > leggi informazioni di Hydstra\n", file=fileout,append=TRUE)
-HYD_anag <- read.csv ( paste(dir_anagrafica,"Anagrafica.csv",sep="") , header = TRUE , dec=",", quote="\"", as.is = TRUE,na.strings = c("-9999",""), sep=";")
+HYD_anag <- read.csv ( paste(dir_anagrafica,"Anagrafica.csv",sep="") , header = TRUE , dec=",", quote="\"", as.is = TRUE,na.strings = c("-9999",""), sep=";") 
 HYD_staz <- HYD_anag$IdStazione[which(is.na(HYD_anag$IdStazione)==F)]
 HYD_nome <- HYD_anag$Nome[which(is.na(HYD_anag$IdStazione)==F)]
 HYD_PP1 <- HYD_anag$IdPluv[which(is.na(HYD_anag$IdStazione)==F)]
@@ -54,14 +54,14 @@ if (inherits(conn,"try-error")) {
 DBmeteo<-try(dbGetQuery(conn,"SET NAMES utf8"), silent=TRUE)
 DBmeteo<-try(dbGetQuery(conn, "
 SELECT
-IDrete,A_Stazioni.IDstazione, A_Sensori.IDsensore, Attributo,IDsensore,Comune, Provincia
+IDrete,A_Stazioni.IDstazione, A_Sensori.IDsensore, Attributo,IDsensore,Comune, Provincia 
 FROM
 A_Stazioni,A_Sensori
 WHERE A_Stazioni.IDstazione=A_Sensori.IDstazione
 AND IDrete in (1,4)
 AND NOMEtipologia ='PP'
-AND DataInizio<'2018-01-01'
-AND (DataFine>'2017-01-01' OR DataFine is NULL)"), silent=TRUE)
+AND DataInizio<'2019-01-01'
+AND (DataFine>'2018-01-01' OR DataFine is NULL)"), silent=TRUE)
 
 DBmeteo_rete<-DBmeteo$IDrete
 DBmeteo_sens<-DBmeteo$IDsensore
@@ -69,11 +69,11 @@ DBmeteo_staz<-DBmeteo$IDstazione
 DBmeteo$Attributo[which(is.na(DBmeteo$Attributo)==T)]=""
 DBmeteo_nome<-paste(DBmeteo$Comune," ",DBmeteo$Attributo)
 
-####################### RICERCA STAZIONI NON IN HYDSTRA SITE
+####################### RICERCA STAZIONI NON IN HYDSTRA SITE 
 
 cat("\n\n -------------------------------------------------------------------\n",file=fileout,append=T)
 cat("\n Ricerca STAZIONI appartenenti al DBmeteo ma non appartenenti ad HYDSTRA SITE\n",file=fileout,append=T)
-aux<-DBmeteo_staz %in% HYD_SITE_staz
+aux<-DBmeteo_staz %in% HYD_SITE_staz 
 if (length(DBmeteo_nome[!aux])>0) {
 cat("\n stazioni trovate: ", length(DBmeteo_staz[!aux]),"\n", file=fileout,append=T)
   cat("\n Rete, IDstaz, Nome\n", file=fileout,append=T)
@@ -121,7 +121,7 @@ cat("\n stazioni trovate : ", length(DBmeteo_staz[!aux]),"\n", file=fileout,appe
   cat("\nstazioni trovate 0\n",file=fileout,append=T)
 }
 
-####### RICERCA PLUVIOMETRI NON IN HYDSTRA Anagrafica
+####### RICERCA PLUVIOMETRI NON IN HYDSTRA Anagrafica   
 
 cat("\n\n -------------------------------------------------------------------\n",file=fileout,append=T)
 cat("\n Ricerca PLUVIOMETRI appartenenti al DBmeteo ma non appartenenti ad HYDSTRA Anagrafica\n",file=fileout,append=T)
@@ -153,7 +153,7 @@ cat("\n pluviometri trovati : ", length(DBmeteo_staz[!aux]),"\n", file=fileout,a
 
 cat("\n\n -------------------------------------------------------------------\n",file=fileout,append=T)
 cat("\n Verifica dei nomi in HYDSTRA SITE\n",file=fileout,append=T)
-cat("\n IDstaz, IDsens, HYD_SITE_nome,HYD_SITE_nome2, HYD_SITE_nome3,  DBmeteo_nome\n", file=fileout,append=T)
+cat("\n IDstaz, IDsens,HYD_SITE_nome,HYD_SITE_nome2, HYD_SITE_nome3,  DBmeteo_nome\n", file=fileout,append=T)
 i<-1
 while(i<=length(DBmeteo_staz)) {
   j<-which(HYD_SITE_staz==DBmeteo_staz[i])
@@ -209,8 +209,9 @@ while(i<=length(DBmeteo_sens)) {
   i <- i + 1
 }
 
+comando <- paste ("mv " , fileout," /srv/www/htdocs/applications/controlli/")
+try(system(comando, intern = TRUE))
 #------------------------------------------------------------------------------
 warnings()
 quit(status=0)
 
-                                                                                 
